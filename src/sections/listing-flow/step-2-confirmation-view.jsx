@@ -179,7 +179,19 @@ export default function Step2ConfirmationView() {
               Estimated Value: ${step1Data.estimatedValue}
             </Typography>
           </Box>
-            
+
+            {/* TODO: Add editable sqft field */}
+            <Box sx={{ mt: 3 }}>
+              <RHFTextField
+                name='sqft'
+                label="Square Footage"
+                type="number"
+                helperText="Enter the confirmed square footage for this property"
+              >
+              </RHFTextField>
+
+            </Box>
+
             {/* TODO: Add navigation buttons (Back to Step 1, Continue) */}
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
               <Button
@@ -201,7 +213,6 @@ export default function Step2ConfirmationView() {
       )}
 
 
-      {/* TODO: Add editable sqft field */}
 
 
       {!isLoading && !step1Data && (<Alert severity='info' sx={{ mt: 3 }}>
