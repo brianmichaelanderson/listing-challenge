@@ -179,18 +179,35 @@ export default function Step2ConfirmationView() {
               Estimated Value: ${step1Data.estimatedValue}
             </Typography>
           </Box>
+            
+            {/* TODO: Add navigation buttons (Back to Step 1, Continue) */}
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+              <Button
+                variant="outlined"
+                onClick={() => router.push('/listing-flow/step-1')}
+                disabled={submitting}
+              >
+                Back
+              </Button>
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={submitting}
+              >
+                {submitting ? 'Saving...' : 'Continue to Step 3'}
+              </Button>
+            </Box>
         </FormProvider>
       )}
 
 
       {/* TODO: Add editable sqft field */}
 
-      {/* TODO: Add navigation buttons (Back to Step 1, Continue) */}
 
-      <Alert severity='info' sx={{ mt: 3 }}>
+      {!isLoading && !step1Data && (<Alert severity='info' sx={{ mt: 3 }}>
         This component needs to be implemented. See the comments and
         requirements above.
-      </Alert>
+      </Alert>)}
     </Box>
   );
 }
