@@ -135,10 +135,9 @@ export default function Step2ConfirmationView() {
           }
         }
       });
-
       if(response.data.success) {
-        console.log('User confirmed sqft: ', data.sqft);
-        console.log('Form data:', data); 
+        console.log('SUCCESS: Navigating to step-3...');
+
         router.push('/listing-flow/step-3')
       }
 
