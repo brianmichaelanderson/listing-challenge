@@ -56,7 +56,7 @@ To start, I worked my way through the codebase to get an initial understanding. 
    - Any security concerns to address?
 
 **Data Management:**
-- I chose to merge the step2 data within `/api/progress/route.js` rather than relying solely on the merge function in `supabase.js`. In production, it's best practice to explicitly control data merging at the API layer to ensure data integrity and provide clearer error handling.
+- I chose to merge the step2 data within `/api/progress/route.js` rather than relying solely on the merge function in `supabase.js`. In production, it's best practice to explicitly control data merging at the API layer to ensure data integrity and provide clearer error handling.  
 
 **Security Enhancements:**
 - **Real Authentication**: The current mock setup automatically authenticates users. In production, implement proper JWT token validation, token expiration handling, and refresh token mechanisms.
@@ -79,3 +79,6 @@ To start, I worked my way through the codebase to get an initial understanding. 
 **User Experience:**
 - **Session Management**: Implement proper session handling with automatic logout on token expiration.
 - **Progressive Enhancement**: Ensure the application works with JavaScript disabled where possible.
+
+**Code Quality & Maintainability:**
+- **Comments**: I chose to leave all comments from the assessment and used similar commenting patterns in step-2, following the style established in step-1. I also preserved comments that were clearly specific to this assessment. In production, I would remove unnecessary comments and follow the team's established commenting standards and code review guidelines.
