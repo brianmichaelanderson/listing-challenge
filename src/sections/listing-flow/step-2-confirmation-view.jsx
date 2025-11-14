@@ -7,7 +7,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import FormProvider from '../../components/hook-form/form-provider';
 import RHFTextField from '../../components/hook-form/rhf-text-field'; //for text input
-import { Box, Typography, Button, Alert, CircularProgress } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Button,
+  Alert,
+  CircularProgress,
+} from '@mui/material';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs/custom-breadcrumbs';
 import axios from '../../lib/axios';
 
@@ -49,8 +55,7 @@ import axios from '../../lib/axios';
 
 //Validation schema for step 2 - square footage
 const Step2Schema = z.object({
-  sqft: z
-    .number({ invalid_type_error: 'Must be a number' })
+  sqft: z.coerce.number() //cast to number
     .min(500, 'Must be at least 500 sqft')
     .max(10000, 'Must be less than 10,000 sqft'),
 });
@@ -65,13 +70,12 @@ export default function Step2ConfirmationView() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
-  const [sqft, setSqft] = useState(0);
 
   // - form methods
   const formMethods = useForm({
     resolver: zodResolver(Step2Schema),
     defaultValues: {
-      sqft: 0,
+      sqft: '',
     },
   });
 
@@ -110,12 +114,43 @@ export default function Step2ConfirmationView() {
     }
   };
 
-
   // TODO: Implement form submission
-  const onSubmit = async (data) => {
+  const onSubmit = handleSubmit(async (data) => {
     // Save step2 data to /api/progress
+    try {
+      setSubmitting(true);
+      setError(null);
+
+      console.log('Form data before submission:', data);
+      
+      const response = await axios.put('/api/progress', {
+        currentStep: 'step-2',
+        progressData: {
+          ...progressData,
+          completedSteps: ['step-1', 'step-2'],
+          step2: {
+            confirmedSqft: data.sqft,
+            confirmedBedrooms: step1Data.bedrooms,
+            confirmedBathrooms: step1Data.bathrooms,
+          }
+        }
+      });
+      if(response.data.success) {
+        console.log('SUCCESS: Navigating to step-3...');
+
+        router.push('/listing-flow/step-3')
+      }
+
+    } catch(err) {
+      console.error('An error occurred updating progress', err)
+      setError(err.response?.data?.error || 'Failed to save progress data')
+    } finally {
+      setSubmitting(false);
+    }
+
+
     // Navigate to next step or show success
-  };
+  });
 
   //extract step1 data from state/ProgressData to populate jsx
   const step1Data = progressData.step1;
@@ -126,7 +161,7 @@ export default function Step2ConfirmationView() {
         heading='Create Listing'
         links={[
           { name: 'Dashboard', href: '/' },
-          { name: 'New Listing', href: '/listing-flow/step-1' },
+          { name: 'New Listing', href: '/listing-flow/step-2' },
           { name: 'Step 2' },
         ]}
       />
@@ -149,7 +184,7 @@ export default function Step2ConfirmationView() {
 
       {/* TODO: Add error state */}
       {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
+        <Alert severity='error' sx={{ mb: 3 }}>
           {error}
         </Alert>
       )}
@@ -166,59 +201,53 @@ export default function Step2ConfirmationView() {
               bgcolor: 'background.neutral',
             }}
           >
-            <Typography variant="subtitle2" gutterBottom>
+            <Typography variant='subtitle2' gutterBottom>
               Property Details
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant='body2' color='text.secondary'>
               Address: {step1Data.propertyAddress}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Bedrooms: {step1Data.bedrooms} | Bathrooms: {step1Data.bathrooms} | Sqft: {step1Data.sqft}
+            <Typography variant='body2' color='text.secondary'>
+              Bedrooms: {step1Data.bedrooms} | Bathrooms: {step1Data.bathrooms}{' '}
+              | Sqft: {step1Data.sqft}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant='body2' color='text.secondary'>
               Estimated Value: ${step1Data.estimatedValue}
             </Typography>
           </Box>
 
-            {/* TODO: Add editable sqft field */}
-            <Box sx={{ mt: 3 }}>
-              <RHFTextField
-                name='sqft'
-                label="Square Footage"
-                type="number"
-                helperText="Enter the confirmed square footage for this property"
-              >
-              </RHFTextField>
+          {/* TODO: Add editable sqft field */}
+          <Box sx={{ mt: 3 }}>
+            <RHFTextField
+              name='sqft'
+              label='Square Footage'
+              type='number'
+              helperText='Enter the confirmed square footage for this property'
+            ></RHFTextField>
+          </Box>
 
-            </Box>
-
-            {/* TODO: Add navigation buttons (Back to Step 1, Continue) */}
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-              <Button
-                variant="outlined"
-                onClick={() => router.push('/listing-flow/step-1')}
-                disabled={submitting}
-              >
-                Back
-              </Button>
-              <Button
-                type="submit"
-                variant="contained"
-                disabled={submitting}
-              >
-                {submitting ? 'Saving...' : 'Continue to Step 3'}
-              </Button>
-            </Box>
+          {/* TODO: Add navigation buttons (Back to Step 1, Continue) */}
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+            <Button
+              variant='outlined'
+              onClick={() => router.push('/listing-flow/step-1')}
+              disabled={submitting}
+            >
+              Back
+            </Button>
+            <Button type='submit' variant='contained' disabled={submitting}>
+              {submitting ? 'Saving...' : 'Continue to Step 3'}
+            </Button>
+          </Box>
         </FormProvider>
       )}
 
-
-
-
-      {!isLoading && !step1Data && (<Alert severity='info' sx={{ mt: 3 }}>
-        This component needs to be implemented. See the comments and
-        requirements above.
-      </Alert>)}
+      {!isLoading && !step1Data && (
+        <Alert severity='info' sx={{ mt: 3 }}>
+          This component needs to be implemented. See the comments and
+          requirements above.
+        </Alert>
+      )}
     </Box>
   );
 }

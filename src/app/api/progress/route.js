@@ -123,7 +123,7 @@ export async function PUT(request) {
 
     //STEP 3: User obtained & db verified user.id
     const userId = user.id;
-    console.log(`[API]' Fetching progress for user: ${userId}`); // dieu
+    console.log(`[API]' Fetching progress for user: ${userId}`); 
 
     //STEP 4: Parse new progress data from request body
     const { currentStep, progressData } = await request.json();
